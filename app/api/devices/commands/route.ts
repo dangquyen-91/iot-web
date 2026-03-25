@@ -1,63 +1,26 @@
-// API Route: Lệnh điều khiển cho ESP polling
-// ESP sẽ gọi GET để lấy lệnh chờ, sau đó gọi PUT để xác nhận đã thực thi
+// API Route: Lenh dieu khien cho ESP polling
+// Su dung MockAPI de luu tru - tuong thich Vercel serverless
 
 import { NextResponse } from 'next/server';
-import type { PendingCommand, DeviceState } from '@/types/iot';
+import {
+  addCommandToQueue,
+  getPendingCommands,
+  markCommandExecuted,
+  getDeviceState,
+  updateDeviceState,
+} from '@/lib/iot-api';
 
-// Queue lệnh chờ ESP thực thi (production nên dùng Redis/Database)
-let commandQueue: PendingCommand[] = [];
-
-// Trạng thái thiết bị hiện tại
-let deviceState: DeviceState = {
-  fan: false,
-  pump: false,
-  lastUpdated: new Date().toISOString(),
-};
-
-// Export để các module khác có thể thêm lệnh
-export function addCommand(command: Omit<PendingCommand, 'id' | 'createdAt' | 'executed'>) {
-  const newCommand: PendingCommand = {
-    ...command,
-    id: Date.now().toString(),
-    createdAt: new Date().toISOString(),
-    executed: false,
-  };
-
-  // Xóa lệnh cũ cho cùng device (chỉ giữ lệnh mới nhất)
-  commandQueue = commandQueue.filter(
-    cmd => !(cmd.deviceId === command.deviceId && cmd.device === command.device && !cmd.executed)
-  );
-
-  commandQueue.push(newCommand);
-  console.log(`[COMMAND] Thêm lệnh: ${command.device} -> ${command.action} (${command.source})`);
-
-  return newCommand;
-}
-
-// Export để lấy trạng thái thiết bị
-export function getDeviceState(): DeviceState {
-  return deviceState;
-}
-
-// Export để cập nhật trạng thái
-export function updateDeviceState(newState: Partial<DeviceState>) {
-  deviceState = {
-    ...deviceState,
-    ...newState,
-    lastUpdated: new Date().toISOString(),
-  };
-}
-
-// GET - ESP polling lấy lệnh chờ thực thi
+// GET - ESP polling lay lenh cho thuc thi
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const deviceId = searchParams.get('deviceId') || 'ESP8266_001';
 
-    // Tìm lệnh chưa thực thi cho device này
-    const pendingCommands = commandQueue.filter(
-      cmd => cmd.deviceId === deviceId && !cmd.executed
-    );
+    // Lay commands chua thuc thi va device state tu MockAPI
+    const [pendingCommands, deviceState] = await Promise.all([
+      getPendingCommands(deviceId),
+      getDeviceState(),
+    ]);
 
     if (pendingCommands.length === 0) {
       return NextResponse.json({
@@ -75,15 +38,15 @@ export async function GET(request: Request) {
       deviceState,
     });
   } catch (error) {
-    console.error('[COMMAND] Lỗi GET:', error);
+    console.error('[COMMAND] Loi GET:', error);
     return NextResponse.json(
-      { success: false, error: 'Lỗi lấy lệnh' },
+      { success: false, error: 'Loi lay lenh' },
       { status: 500 }
     );
   }
 }
 
-// POST - Thêm lệnh điều khiển thủ công từ Web
+// POST - Them lenh dieu khien thu cong tu Web
 export async function POST(request: Request) {
   try {
     const data = await request.json();
@@ -91,96 +54,82 @@ export async function POST(request: Request) {
     // Validate
     if (!['fan', 'pump'].includes(data.device)) {
       return NextResponse.json(
-        { success: false, error: 'Thiết bị không hợp lệ' },
+        { success: false, error: 'Thiet bi khong hop le' },
         { status: 400 }
       );
     }
 
     if (!['on', 'off'].includes(data.action)) {
       return NextResponse.json(
-        { success: false, error: 'Hành động không hợp lệ' },
+        { success: false, error: 'Hanh dong khong hop le' },
         { status: 400 }
       );
     }
 
-    const command = addCommand({
+    const command = await addCommandToQueue({
       deviceId: data.deviceId || 'ESP8266_001',
       device: data.device,
       action: data.action,
       source: 'manual',
-      reason: 'Điều khiển thủ công từ Web',
+      reason: 'Dieu khien thu cong tu Web',
     });
+
+    if (!command) {
+      return NextResponse.json(
+        { success: false, error: 'Khong the them lenh' },
+        { status: 500 }
+      );
+    }
+
+    console.log(`[COMMAND] Them lenh: ${data.device} -> ${data.action}`);
 
     return NextResponse.json({
       success: true,
-      message: `Đã gửi lệnh ${data.action} cho ${data.device}`,
+      message: `Da gui lenh ${data.action} cho ${data.device}`,
       command,
     });
   } catch (error) {
-    console.error('[COMMAND] Lỗi POST:', error);
+    console.error('[COMMAND] Loi POST:', error);
     return NextResponse.json(
-      { success: false, error: 'Lỗi thêm lệnh' },
+      { success: false, error: 'Loi them lenh' },
       { status: 500 }
     );
   }
 }
 
-// PUT - ESP xác nhận đã thực thi lệnh
+// PUT - ESP xac nhan da thuc thi lenh
 export async function PUT(request: Request) {
   try {
     const data = await request.json();
-    const { commandId, deviceId, actualState } = data;
+    const { commandId, actualState } = data;
 
-    // Đánh dấu lệnh đã thực thi
+    // Danh dau lenh da thuc thi
     if (commandId) {
-      const cmdIndex = commandQueue.findIndex(cmd => cmd.id === commandId);
-      if (cmdIndex !== -1) {
-        commandQueue[cmdIndex].executed = true;
-        commandQueue[cmdIndex].executedAt = new Date().toISOString();
-      }
+      await markCommandExecuted(commandId);
     }
 
-    // Cập nhật trạng thái thực tế từ ESP
+    // Cap nhat trang thai thuc te tu ESP
     if (actualState) {
-      deviceState = {
-        fan: actualState.fan ?? deviceState.fan,
-        pump: actualState.pump ?? deviceState.pump,
-        lastUpdated: new Date().toISOString(),
-      };
+      await updateDeviceState({
+        fan: actualState.fan,
+        pump: actualState.pump,
+      });
 
-      console.log(`[COMMAND] ESP báo cáo trạng thái: Fan=${deviceState.fan}, Pump=${deviceState.pump}`);
+      console.log(`[COMMAND] ESP bao cao trang thai: Fan=${actualState.fan}, Pump=${actualState.pump}`);
     }
 
-    // Dọn dẹp lệnh cũ đã thực thi (giữ 50 lệnh gần nhất)
-    const executedCommands = commandQueue.filter(cmd => cmd.executed);
-    if (executedCommands.length > 50) {
-      commandQueue = [
-        ...commandQueue.filter(cmd => !cmd.executed),
-        ...executedCommands.slice(-50),
-      ];
-    }
+    const deviceState = await getDeviceState();
 
     return NextResponse.json({
       success: true,
-      message: 'Đã cập nhật trạng thái',
+      message: 'Da cap nhat trang thai',
       deviceState,
     });
   } catch (error) {
-    console.error('[COMMAND] Lỗi PUT:', error);
+    console.error('[COMMAND] Loi PUT:', error);
     return NextResponse.json(
-      { success: false, error: 'Lỗi cập nhật' },
+      { success: false, error: 'Loi cap nhat' },
       { status: 500 }
     );
   }
-}
-
-// DELETE - Xóa tất cả lệnh chờ (cho admin/debug)
-export async function DELETE() {
-  const pendingCount = commandQueue.filter(cmd => !cmd.executed).length;
-  commandQueue = commandQueue.filter(cmd => cmd.executed);
-
-  return NextResponse.json({
-    success: true,
-    message: `Đã xóa ${pendingCount} lệnh chờ`,
-  });
 }
