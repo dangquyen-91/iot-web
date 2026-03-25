@@ -22,7 +22,7 @@
 
 // ==================== CAU HINH ====================
 
-// WiFi - thay thong tin WiFi cua ban
+// WiFi
 const char* WIFI_SSID = "DangHuyen";
 const char* WIFI_PASSWORD = "MAT_KHAU_WIFI_CUA_BAN";
 

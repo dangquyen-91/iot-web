@@ -20,10 +20,10 @@
 
 // WiFi
 const char* WIFI_SSID = "DangHuyen";
-const char* WIFI_PASSWORD = "MAT_KHAU_WIFI_CUA_BAN";  // Thay mat khau WiFi cua ban o day
+const char* WIFI_PASSWORD = "MAT_KHAU_WIFI_CUA_BAN";
 
-// Server URL (dia chi may chay Next.js)
-const char* SERVER_URL = "http://192.168.1.9:3000";
+// Server URL (Vercel)
+const char* SERVER_URL = "https://iot-web-mu.vercel.app";
 
 // Device ID - khac voi ESP chinh (ESP8266_001)
 const char* DEVICE_ID = "ESP8266_002";
