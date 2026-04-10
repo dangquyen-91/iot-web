@@ -8,8 +8,8 @@ interface ConnectionStatusProps {
 
 export default function ConnectionStatus({
   isConnected,
-  connectedText = 'ESP8266 da ket noi',
-  disconnectedText = 'Chua co du lieu',
+  connectedText = 'ESP8266 đã kết nối',
+  disconnectedText = 'Chưa có dữ liệu',
 }: ConnectionStatusProps) {
   return (
     <div className="flex items-center gap-2">

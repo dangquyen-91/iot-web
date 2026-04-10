@@ -27,7 +27,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <Header title="Bang dieu khien" />
+      <Header title="Bảng điều khiển" />
 
       <div className="flex-1 p-6 space-y-6 overflow-auto">
         {/* Date & Time Display */}
@@ -40,14 +40,14 @@ export default function DashboardPage() {
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">Thoi gian he thong</p>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">Thời gian hệ thống</p>
                 <p className="text-2xl font-bold text-zinc-900 dark:text-white">{formatTime(currentTime)}</p>
                 <p className="text-sm font-medium text-zinc-600 dark:text-zinc-300">{formatDate(currentTime)}</p>
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <ConnectionStatus isConnected={isConnected} connectedText="ESP8266_001 da ket noi" />
-              <ConnectionStatus isConnected={connected002} connectedText="ESP8266_002 da ket noi" />
+              <ConnectionStatus isConnected={isConnected} connectedText="ESP8266_001 đã kết nối" />
+              <ConnectionStatus isConnected={connected002} connectedText="ESP8266_002 đã kết nối" />
             </div>
           </div>
         </Card>
@@ -58,7 +58,7 @@ export default function DashboardPage() {
           <Card>
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
               <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-zinc-400'}`}></span>
-              Dữ liệu cảm biến (Realtime)
+              Dữ liệu cảm biến (Thời gian thực)
             </h3>
             <div className="space-y-4">
               <SensorCard

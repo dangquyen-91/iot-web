@@ -76,7 +76,7 @@ const SettingsIcon = (
 const userNavItems: NavItem[] = [
   { href: '/dashboard', label: 'Bảng điều khiển', icon: DashboardIcon },
   { href: '/monitoring', label: 'Giám sát', icon: MonitoringIcon },
-  { href: '/settings', label: 'Cài đặt', icon: SettingsIcon },
+  // { href: '/settings', label: 'Cài đặt', icon: SettingsIcon },
 ];
 
 // Menu items chỉ cho admin

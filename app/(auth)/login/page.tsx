@@ -29,11 +29,11 @@ function LoginContent() {
         const redirect = searchParams.get('redirect') || '/dashboard';
         router.push(redirect);
       } else {
-        setError(result.error || 'Dang nhap that bai');
+        setError(result.error || 'Đăng nhập thất bại');
       }
     } catch (err) {
       console.error('Login error:', err);
-      setError('Da xay ra loi. Vui long thu lai.');
+      setError('Đã xảy ra lỗi. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }

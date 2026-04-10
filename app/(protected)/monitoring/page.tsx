@@ -87,7 +87,7 @@ export default function MonitoringPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <Header title="Giam sat" />
+      <Header title="Giám sát" />
 
       <div className="flex-1 p-6 space-y-6 overflow-auto">
         {/* Date & Time Display */}
@@ -100,15 +100,15 @@ export default function MonitoringPage() {
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">Thoi gian he thong</p>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">Thời gian hệ thống</p>
                 <p className="text-2xl font-bold text-zinc-900 dark:text-white">{formatTime(currentTime)}</p>
                 <p className="text-sm font-medium text-zinc-600 dark:text-zinc-300">{formatDate(currentTime)}</p>
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <ConnectionStatus isConnected={connected001} connectedText="ESP8266_001 da ket noi" />
-              <ConnectionStatus isConnected={connected002} connectedText="ESP8266_002 da ket noi" />
-              <ConnectionStatus isConnected={cameraConnected} connectedText="ESP32-CAM da ket noi" />
+              <ConnectionStatus isConnected={connected001} connectedText="ESP8266_001 đã kết nối" />
+              <ConnectionStatus isConnected={connected002} connectedText="ESP8266_002 đã kết nối" />
+              <ConnectionStatus isConnected={cameraConnected} connectedText="ESP32-CAM đã kết nối" />
             </div>
           </div>
         </Card>
@@ -117,10 +117,10 @@ export default function MonitoringPage() {
         <Card>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
-              Du lieu cam bien gan day
+              Dữ liệu cảm biến gần đây
             </h3>
             <span className="text-sm text-zinc-500 dark:text-zinc-400">
-              {allHistory.length} ban ghi
+              {allHistory.length} bản ghi
             </span>
           </div>
           <div className="overflow-x-auto">
@@ -128,10 +128,10 @@ export default function MonitoringPage() {
               <thead>
                 <tr className="border-b border-zinc-200 dark:border-zinc-700">
                   <th className="py-3 px-4 font-medium text-zinc-500 dark:text-zinc-400">#</th>
-                  <th className="py-3 px-4 font-medium text-zinc-500 dark:text-zinc-400">Thoi gian</th>
-                  <th className="py-3 px-4 font-medium text-zinc-500 dark:text-zinc-400">Nhiet do</th>
-                  <th className="py-3 px-4 font-medium text-zinc-500 dark:text-zinc-400">Do am</th>
-                  <th className="py-3 px-4 font-medium text-zinc-500 dark:text-zinc-400">Muc nuoc</th>
+                  <th className="py-3 px-4 font-medium text-zinc-500 dark:text-zinc-400">Thời gian</th>
+                  <th className="py-3 px-4 font-medium text-zinc-500 dark:text-zinc-400">Nhiệt độ</th>
+                  <th className="py-3 px-4 font-medium text-zinc-500 dark:text-zinc-400">Độ ẩm</th>
+                  <th className="py-3 px-4 font-medium text-zinc-500 dark:text-zinc-400">Mức nước</th>
                   <th className="py-3 px-4 font-medium text-zinc-500 dark:text-zinc-400">Device ID</th>
                 </tr>
               </thead>
@@ -149,7 +149,7 @@ export default function MonitoringPage() {
                 {allHistory.length === 0 && (
                   <tr>
                     <td colSpan={6} className="py-8 text-center text-zinc-500">
-                      Chua co du lieu tu ESP8266. Hay dam bao ESP8266 dang chay va gui du lieu den server.
+                      Chưa có dữ liệu từ ESP8266. Hãy đảm bảo ESP8266 đang chạy và gửi dữ liệu đến server.
                     </td>
                   </tr>
                 )}
