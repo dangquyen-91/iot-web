@@ -15,6 +15,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <ESP8266WebServer.h>
+#include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
 #include <DHT.h>
 
@@ -46,7 +47,7 @@ const int relay_quat = 12;   // D6 - Relay quat
 DHT dht(DHTPin, DHTTYPE);
 
 ESP8266WebServer server(80);
-WiFiClient wifiClient;
+WiFiClientSecure wifiClient;
 
 // Bien trang thai
 bool pumpState = false;
@@ -129,6 +130,8 @@ void connectWiFi() {
     Serial.println("\n[WiFi] Da ket noi!");
     Serial.print("[WiFi] Dia chi IP: ");
     Serial.println(WiFi.localIP());
+    // Bo qua kiem tra certificate cho HTTPS (Vercel)
+    wifiClient.setInsecure();
   } else {
     Serial.println("\n[WiFi] Ket noi that bai! Khoi dong lai...");
     ESP.restart();
