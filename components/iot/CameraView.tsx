@@ -38,7 +38,7 @@ export default function CameraView({ defaultUrl = '' }: CameraViewProps) {
       <div className="aspect-video bg-zinc-900 rounded-lg overflow-hidden flex items-center justify-center">
         {cameraUrl ? (
           <img
-            src={`${cameraUrl}/stream`}
+            src={`${cameraUrl}/stream${cameraUrl.includes('ngrok') ? '?ngrok-skip-browser-warning=true' : ''}`}
             alt="ESP32-CAM Stream"
             className="w-full h-full object-contain"
             onError={(e) => {
