@@ -98,14 +98,6 @@ export default function AdminPage() {
       extra: null,
     },
     {
-      id: 'ESP32-CAM',
-      name: 'ESP32-CAM',
-      description: 'Camera giám sát',
-      type: 'Camera',
-      status: cameraConnected ? 'online' : 'offline',
-      extra: null,
-    },
-    {
       id: 'relay-fan',
       name: 'Quạt thông gió',
       description: 'Relay D6 (GPIO 12) — ESP8266_001',
@@ -183,7 +175,6 @@ export default function AdminPage() {
                   <th className="py-3 px-4 font-medium text-zinc-500 dark:text-zinc-400 text-sm">Mô tả</th>
                   <th className="py-3 px-4 font-medium text-zinc-500 dark:text-zinc-400 text-sm">Loại</th>
                   <th className="py-3 px-4 font-medium text-zinc-500 dark:text-zinc-400 text-sm">Kết nối</th>
-                  <th className="py-3 px-4 font-medium text-zinc-500 dark:text-zinc-400 text-sm">Trạng thái</th>
                 </tr>
               </thead>
               <tbody>
@@ -207,17 +198,6 @@ export default function AdminPage() {
                         }`} />
                         {device.status === 'online' ? 'Online' : 'Offline'}
                       </span>
-                    </td>
-                    <td className="py-3 px-4 text-sm text-zinc-500 dark:text-zinc-400">
-                      {device.extra ? (
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                          device.extra === 'Đang bật'
-                            ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400'
-                            : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-700 dark:text-zinc-400'
-                        }`}>
-                          {device.extra}
-                        </span>
-                      ) : '—'}
                     </td>
                   </tr>
                 ))}
